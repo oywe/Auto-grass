@@ -1,0 +1,22 @@
+name: Auto Commit
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # 毎日0時に実行
+  workflow_dispatch:    # 手動でも実行可能
+
+jobs:
+  commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Create or update file
+        run: |
+          echo "Auto commit $(date)" >> commit.txt
+      - name: Commit changes
+        run: |
+          git config --local user.email "you@example.com"
+          git config --local user.name oywe"
+          git add .
+          git commit -m "Auto commit $(date)" || echo "No changes to commit"
+          git push
