@@ -1,22 +1,33 @@
-name: Auto Commit
+name: grass
 
 on:
   schedule:
-    - cron: '*/10 * * * *'  # 毎日0時に実行
-  workflow_dispatch:    # 手動でも実行可能
+    - cron: '*/10 * * * *'  # 毎時0分（1時間ごと）
+  workflow_dispatch:     # 手動実行も可能
 
 jobs:
-  commit:
+  generate-json:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - name: Create or update file
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Generate time.json
         run: |
-          echo "Auto commit $(date)" >> commit.txt
-      - name: Commit changes
+          mkdir -p output
+          echo "{\"time\": \"$(date --iso-8601=seconds)\"}" > output/time.json
+
+      - name: Commit and Push
         run: |
-          git config --local user.email "you@example.com"
-          git config --local user.name oywe"
-          git add .
-          git commit -m "Auto commit $(date)" || echo "No changes to commit"
+          git config user.name "owye"
+          git config user.email "github-actions[bot]@example.com"
+          cp output/time.json ./time.json
+          git add time.json
+          git commit -m "Update time.json at $(date)" || echo "No changes to commit"
           git push
